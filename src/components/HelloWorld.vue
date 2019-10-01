@@ -65,7 +65,9 @@
         </el-col>
       </el-aside>
       <!-- 显示区 -->
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view/>
+      </el-main>
     </el-container>
   </el-container>
 </template>
