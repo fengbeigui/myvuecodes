@@ -14,7 +14,7 @@
         </el-col>
         <el-col :span="6">
           <div class="grid-content bg-purple">
-            <el-button type="warning" class="text" disabled>退出</el-button>
+            <el-button type="warning" class="text" @click.stop="lognOut" >退出</el-button>
           </div>
         </el-col>
       </el-row>
@@ -25,46 +25,44 @@
       <el-aside width="200px">
         <el-col :span="24">
           <!-- 增加路由 -->
-          <el-menu
-            :router="true"
-            default-active="2"
-            class="el-menu-vertical-demo"
-  
-          >
+          <el-menu :router="true" default-active="2" class="el-menu-vertical-demo">
             <el-submenu index="1">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>用户管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="users"><i class="el-icon-edit"></i>用户列表</el-menu-item>
-                <el-menu-item index="1-2"><i class="el-icon-edit"></i>用户列表2</el-menu-item>
+                <el-menu-item index="users">
+                  <i class="el-icon-edit"></i>用户列表
+                </el-menu-item>
+                <el-menu-item index="1-2">
+                  <i class="el-icon-edit"></i>用户列表2
+                </el-menu-item>
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
 
-          <el-menu
-            default-active="2"
-            class="el-menu-vertical-demo"
-
-          >
+          <el-menu default-active="2" class="el-menu-vertical-demo">
             <el-submenu index="2">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>权限管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="2-1"><i class="el-icon-tickets"></i>角色列表</el-menu-item>
-                <el-menu-item index="2-2"><i class="el-icon-tickets"></i>权限列表</el-menu-item>
+                <el-menu-item index="2-1">
+                  <i class="el-icon-tickets"></i>角色列表
+                </el-menu-item>
+                <el-menu-item index="2-2">
+                  <i class="el-icon-tickets"></i>权限列表
+                </el-menu-item>
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
-
         </el-col>
       </el-aside>
       <!-- 显示区 -->
       <el-main>
-        <router-view/>
+        <router-view />
       </el-main>
     </el-container>
   </el-container>
@@ -72,16 +70,27 @@
 
 <script>
 export default {
-        //其它页面全部依赖home加载
-        //如果没有登录，直接跳转到登录页面
-        //利用钩子函数，在页面渲染之前，获取判断用户登录
-        mounted(){
-          var token = window.localStorage.getItem('token');
-          if(!token){
-            this.$message.error('请登录');
-            this.$router.push({name:'login'})
-          }
-        }
+  //其它页面全部依赖home加载
+  //如果没有登录，直接跳转到登录页面
+  //利用钩子函数，在页面渲染之前，获取判断用户登录
+  mounted() {
+    var token = window.localStorage.getItem("token");
+    if (!token) {
+      this.$message.error("请登录");
+      this.$router.push({ name: "login" });
+    }
+  },
+  // methods方法
+  methods: {
+    //事件对象lognOut
+    lognOut() {
+      //删除token
+      window.localStorage.clear("token");
+      //跳转到登录页
+        this.$router.push({ name: "login" });
+      
+    }
+  }
 };
 </script>
 
