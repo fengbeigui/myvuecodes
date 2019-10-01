@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 //导入登录
 import Login from '@/components/login/login'
 
+
 Vue.use(Router)
 
 export default new Router({
