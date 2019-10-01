@@ -29,8 +29,7 @@
             :router="true"
             default-active="2"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
+  
           >
             <el-submenu index="1">
               <template slot="title">
@@ -47,8 +46,7 @@
           <el-menu
             default-active="2"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
+
           >
             <el-submenu index="2">
               <template slot="title">
@@ -74,12 +72,16 @@
 
 <script>
 export default {
-  name: "HelloWorld",
-  data() {
-    return {
-      msg: "Welcome to Your Vue.js App，我是主页"
-    };
-  }
+        //其它页面全部依赖home加载
+        //如果没有登录，直接跳转到登录页面
+        //利用钩子函数，在页面渲染之前，获取判断用户登录
+        mounted(){
+          var token = window.localStorage.getItem('token');
+          if(!token){
+            this.$message.error('请登录');
+            this.$router.push({name:'login'})
+          }
+        }
 };
 </script>
 

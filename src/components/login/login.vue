@@ -72,9 +72,10 @@ export default {
         )
         .then(back_data => {
           console.log(back_data);
-          var { data, meta } = back_data.data;
+          //var { data, meta } = back_data.data;
           //判断  如果登录成功，做跳转
-          if (meta.status == 200) {
+          if (back_data.data.meta.status == 200) {
+              window.localStorage.setItem('token',back_data.data.data.token);
             //element插件属性
             this.$message({
               message: "恭喜你，登录成功",
