@@ -24,7 +24,9 @@
       <!-- 侧边栏 -->
       <el-aside width="200px">
         <el-col :span="24">
+          <!-- 增加路由 -->
           <el-menu
+            :router="true"
             default-active="2"
             class="el-menu-vertical-demo"
             @open="handleOpen"
@@ -36,19 +38,19 @@
                 <span>用户管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="1-1"><i class="el-icon-edit"></i>用户列表</el-menu-item>
+                <el-menu-item index="users"><i class="el-icon-edit"></i>用户列表</el-menu-item>
                 <el-menu-item index="1-2"><i class="el-icon-edit"></i>用户列表2</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
 
-                    <el-menu
+          <el-menu
             default-active="2"
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
           >
-            <el-submenu index="1">
+            <el-submenu index="2">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>权限管理</span>

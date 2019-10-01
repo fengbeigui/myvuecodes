@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 //导入登录
 import Login from '@/components/login/login'
-
+import Users from '@/components/users/users'
 
 Vue.use(Router)
 
@@ -17,6 +17,11 @@ export default new Router({
     {
       path: '/login',
       component: Login
+    },
+    {
+      path: '/users',
+      name: 'users',
+      component: Users
     }
   ]
 })
