@@ -3,6 +3,14 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+// 引入axios
+import axios from 'axios';
+//使用axios,这样但是不友好
+//Vue.prototype.$axios = axios;
+// 导入 myaxios 模块
+import myaxios from '@/assets/js/myaxios.js'
+Vue.use(myaxios) // 注册使用 axios 插件
+
 
 //引入elementUI组件
 import ElementUI from 'element-ui'; 
