@@ -83,6 +83,8 @@ export default {
             });
             //登录成功，跳转到主页，编程式导航
             this.$router.push("/");
+          }else{
+              this.$message.error('登录失败,账号或者密码不正确,请重新输入');
           }
         });
 

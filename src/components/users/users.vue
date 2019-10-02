@@ -97,7 +97,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <!-- 关闭窗口 -->
-        <el-button @click="editUserShow = false">取 消</el-button>
+        <el-button @click="quxiaoxiugai">取 消</el-button>
         <!--  绑定确定事件，发送数据到服务器入库 -->
         <el-button type="primary" @click="editUserPut">确 定</el-button>
       </div>
@@ -112,6 +112,8 @@ export default {
       //修改用户窗口 隐藏显示
       editUserShow: false,
       usereditData: {
+        //给他一个id
+        id: "",
         username: "",
         email: "",
         mobile: ""
@@ -293,12 +295,49 @@ export default {
     },
     //控制修改用户的窗口显示
     editUser(scope) {
-        //接收点击事件传入的用户数据
-        //将数据修改到中usereditData 使数据展示在表单中
+      //接收点击事件传入的用户数据
+      //将数据修改到中usereditData 使数据展示在表单中
       this.usereditData = scope.row;
       this.editUserShow = true;
     },
-    editUserPut() {}
+    //修改用户数据
+    editUserPut() {
+       // console.log(this.usereditData);
+       let id = this.usereditData.id;
+        let email = this.usereditData.email;
+        let mobile = this.usereditData.mobile;
+        //发送put请求到服务器
+      this.$myHttp({
+          url:`users/${id}`,
+          method:'put',
+          data:{email,mobile}
+      }).then(backdata=>{
+          //console.log(backdata);
+          //使用对象的解构赋值获取data及mate
+          let{data,meta} = backdata.data;
+          if(meta.status == 200){
+              this.$message({
+                  message:"修改成功",
+                  type:"sucess"
+              });
+          }else{
+              this.$message.error('修改失败');
+          }
+          //关掉窗口
+           this.editUserShow = false;
+          //不管修改成功还是失败，都重新加载数据
+           this.getUserList();
+
+      })
+    },
+    //取消修改用户操作
+    quxiaoxiugai(){
+        //关闭窗口,
+        this.editUserShow =  false;
+        //重新获取数据,因为数据使用双向数据绑定，
+        //当点击取消按钮需要重新获取数据
+        this.getUserList();
+    }
   },
   //利用钩子函数在页面渲染之前获取用户列表数据
   mounted() {
