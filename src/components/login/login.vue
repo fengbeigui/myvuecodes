@@ -67,7 +67,7 @@ export default {
 
       // 使用axios自己封装的axios的$myHttp,发送post 请求，传入data中的数据,注意写法
       this.$myHttp
-        .post("http://localhost:8888/api/private/v1/login", 
+        .post("login", 
         this.form,
         )
         .then(back_data => {

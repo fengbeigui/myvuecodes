@@ -47,12 +47,13 @@ export default {
   mounted() {
     //封装了axios请求，名字为$myHttp
     this.$myHttp({
-      url: "http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=20",
+    //由于封装了axios,前面那串固定的链接可省略
+      url: "users?pagenum=1&pagesize=20",
       method: "get",
-      // `headers` 是即将被发送的自定义请求头
-      headers: { "Authorization": window.localStorage.getItem("token") }
+      // `headers` 是即将被发送的自定义请求头，已封装到axios
+    //   headers: { "Authorization": window.localStorage.getItem("token") }
     }).then(backdata => {
-      console.log(backdata);
+     // console.log(backdata);
       if(backdata.data.meta.status == 200){
           this.tableData = backdata.data.data.users;
       }else{
