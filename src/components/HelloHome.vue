@@ -35,9 +35,7 @@
                 <el-menu-item index="users">
                   <i class="el-icon-edit"></i>用户列表
                 </el-menu-item>
-                <el-menu-item index="1-2">
-                  <i class="el-icon-edit"></i>用户列表2
-                </el-menu-item>
+
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
