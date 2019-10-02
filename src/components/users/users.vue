@@ -53,8 +53,16 @@
     </el-table>
 
     <!-- 分页 -->
+    <!--    @size-change="sizeChange"
+        页面显示条数修改时触发
+        :page-sizes="[1, 2, 3, 4, 20]" 条数可选列表
+         :page-size="20"默认显示条数
+          :total="total"显示总条数
+          @current-change = "pageChange"改变页面触发事件
+     -->
     <el-pagination
         @size-change="sizeChange"
+        @current-change = "pageChange"
       :page-sizes="[1, 2, 3, 4, 20]"
       :page-size="20"
       layout="total, sizes, prev, pager, next, jumper"
@@ -205,11 +213,21 @@ export default {
       //分页数据
       //显示Invalid prop: type check failed for prop "total"；给他一个默认值0
       total:2, //总条数
+      //默认控制显示的条数
       sizepage:20,
+      //当前默认页码
+      page:1,
     };
   },
   methods: {
-
+      //页码改变时，触发的函数
+      pageChange(page){
+          //console.log(page);
+          this.page = page;
+           this.getUserList();
+          
+      },
+      //显示条数被修改后触发
       sizeChange(size){
           //console.log(size);
           this.sizepage = size;
@@ -224,10 +242,11 @@ export default {
     //传一个参数 query 默认为空
     getUserList(query = "") {
       if (query == "") {
-        var url = `users?pagenum=1&pagesize=${this.sizepage}`;
+          //${this.sizepage}获取每页条数
+        var url = `users?pagenum=${this.page}&pagesize=${this.sizepage}`;
       } else {
         //等于加上你传来的query
-        var url = "users?pagenum=1&pagesize=20&query=" + query;
+        var url = "users?pagenum=${this.page}&pagesize=${this.sizepage}" + query;
       }
 
       //封装了axios请求，名字为$myHttp
