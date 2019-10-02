@@ -11,7 +11,7 @@
       <el-input placeholder="请输入内容" v-model="searchData" class="input-with-select">
         <el-button slot="append" @click.stop="searchGet" icon="el-icon-search"></el-button>
       </el-input>
-      <el-button type="primary">主要按钮</el-button>
+      <el-button @click.stop="userShow" type="primary">添加用户</el-button>
     </div>
     <!-- 表格 -->
     <el-table ref="singleTable" :data="tableData" highlight-current-row style="width: 100%">
@@ -36,14 +36,37 @@
 
     <!-- 分页 -->
     <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage4"
       :page-sizes="[100, 200, 300, 400]"
       :page-size="100"
       layout="total, sizes, prev, pager, next, jumper"
       :total="400"
     ></el-pagination>
+
+    <!--  添加用户弹窗 ,不要那个冒号就不绑定了-->
+    <!-- visible控制窗口的显示与隐藏 -->
+    <el-dialog title="添加用户" :visible.sync="addUserShow">
+      <!--  使用双向数据绑定 操作表单数据 -->
+      <el-form :model="userAddData" :rules="rules" ref="userAddData">
+        <el-form-item label="用户名" label-width="200px" prop="username">
+          <el-input v-model="userAddData.username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" label-width="200px" prop="password">
+          <el-input v-model="userAddData.password" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" label-width="200px">
+          <el-input v-model="userAddData.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" label-width="200px" prop="mobile">
+          <el-input v-model="userAddData.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <!-- 关闭窗口 -->
+        <el-button @click="addUserShow = false">取 消</el-button>
+        <!--  绑定确定事件，发送数据到服务器入库 -->
+        <el-button type="primary" @click="addUserPost ">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -51,6 +74,43 @@
 export default {
   data() {
     return {
+      /* 窗口显示控制数据 */
+      addUserShow: false,
+      //注意这些名字是获取后台数据的名字，需要对应，使用mobile名导致手机并不显示
+      userAddData: {
+        username: "",
+        password: "",
+        email: "",
+        mobile: ""
+      },
+      //保存一个对象,这是验证规则
+      rules: {
+        //验证用户名，使用prop
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            required: true,
+            min: 3,
+            max: 8,
+            message: "长度在 3 到 8 个数字",
+            trigger: "blur"
+          }
+        ],
+        mobile: [
+          { required: true, message: "请输入11位数字", trigger: "blur" },
+          {
+            required: true,
+            min: 11,
+            max: 11,
+            message: "长度请输入11位数字",
+            trigger: "blur"
+          }
+        ]
+      },
+
       //搜索框内容
       searchData: "",
       value: true,
@@ -61,13 +121,13 @@ export default {
     //一开始接口发送get请求获取信息，模糊查询也需要获取
     //创建 封装getUserList一个公用的方法
     //传一个参数 query 默认为空
-    getUserList(query='') {
-        if(query==''){
-            var url = "users?pagenum=1&pagesize=20"
-        }else{
-            //等于加上你传来的query
-            var url = "users?pagenum=1&pagesize=20&query="+query;
-        }
+    getUserList(query = "") {
+      if (query == "") {
+        var url = "users?pagenum=1&pagesize=20";
+      } else {
+        //等于加上你传来的query
+        var url = "users?pagenum=1&pagesize=20&query=" + query;
+      }
 
       //封装了axios请求，名字为$myHttp
       this.$myHttp({
@@ -78,6 +138,7 @@ export default {
         // `headers` 是即将被发送的自定义请求头，已封装到axios
         //   headers: { "Authorization": window.localStorage.getItem("token") }
       }).then(backdata => {
+        //解析数据对象
         // console.log(backdata);
         if (backdata.data.meta.status == 200) {
           this.tableData = backdata.data.data.users;
@@ -87,22 +148,63 @@ export default {
     },
     //模糊查找搜索信息,把searchData值传过来
     searchGet() {
-    //   this.$myHttp({
-    //     method: "get",
-    //     url: "users?"
-    //   });
-    this.getUserList(this.searchData);
+      //   this.$myHttp({
+      //     method: "get",
+      //     url: "users?"
+      //   });
+      this.getUserList(this.searchData);
+    },
+    //显示添加用户面板
+    userShow() {
+      this.addUserShow = true;
+    },
+    //请求接口，添加用户
+    addUserPost() {
+      //如果验证信息有错误不提交数据，这里根据上面起名不是form了，是userAddData
+      this.$refs.userAddData.validate(res => {
+        //如果有错误信息  直接停止代码执行
+        if (res) {
+          return;
+        }
+      });
+
+      //console.log(this.userAddData);
+      this.$myHttp({
+        url: "users",
+        method: "post",
+        //直接将vue data数据中的userAddData拿过来
+        //userAddData就是弹出表单中的数据
+        data: this.userAddData
+      }).then(backdata => {
+        let { data, meta } = backdata.data;
+        console.log(data, meta);
+        if (meta.status == 201) {
+          //提示添加用户成功
+          //element插件属性,
+          this.$message({
+            message: "添加用户成功",
+            type: "success"
+          });
+          //把窗口关掉
+          this.addUserShow = false;
+          //如果成功，重新获取数据
+          this.getUserList();
+        }
+      });
     }
   },
   //利用钩子函数在页面渲染之前获取用户列表数据
   mounted() {
-      //调用 获取所有用户的信息，传searchData值过来
-      this.getUserList();
+    //调用 获取所有用户的信息，传searchData值过来
+    this.getUserList();
   }
 };
 </script>
 
 <style>
+.el-main {
+  line-height: 30px;
+}
 .search {
   line-height: 30px;
   text-align: left;
