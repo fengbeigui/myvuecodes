@@ -117,21 +117,21 @@
           <span>{{rolesData.username}}</span>
         </el-form-item>
         <el-form-item label="角色" label-width="200px">
-          <el-select v-model="value" placeholder="请选择">
+          <el-select v-model="roleId" placeholder="请选择">
             <el-option
-              v-for="item in options"
+              v-for="item in roleList"
               :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              :label="item.roleName"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <!-- 关闭窗口 -->
-        <el-button @click="quxiaoxiugai">取 消</el-button>
+        <el-button @click="rolesShow=false">取 消</el-button>
         <!--  绑定确定事件，发送数据到服务器入库 -->
-        <el-button type="primary" @click="editUserPut">确 定</el-button>
+        <el-button type="primary" @click="rolePut">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -141,28 +141,13 @@
 export default {
   data() {
     return {
-         options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
-         value: '',
-
       //修改用户角色
       rolesShow: false,
       //要修改角色的用户信息
       rolesData: {},
+      //角色
+      roleList: [],
+      roleId: "",
 
 
       //修改用户窗口 隐藏显示
@@ -395,9 +380,35 @@ export default {
     },
     //修改用户角色窗口展示
     rolesShowClick(scope) {
-       // console.log(scope);
-       this.rolesData = scope.row;
-       this.rolesShow = true;
+      //需求获取所有角色的列表
+      //然后将角色内容，展示到下拉列表中
+      //this.$myHttp({}).then(backdata=>{})
+      this.$myHttp({
+        url: "roles",
+        method: "get"
+      }).then(backdata => {
+        //console.log(backdata);
+        this.roleList = backdata.data.data;
+      });
+ 
+      this.rolesData = scope.row;
+      this.rolesShow = true;
+    },
+    rolePut(){ 
+        //console.log(this.roleId,this.rolesData.id);
+        this.$myHttp({
+            url:`users/${this.rolesData.id}/role`,
+            method:'put',
+            data:{rid:this.roleId},
+        }).then(backdata=>{
+            //console.log(backdata);
+            let {data,meta}=backdata.data;
+            if(meta.status==200){
+                this.rolesShow = false;
+                this.$message({message:'修改角色成功',type:'success'})
+            }
+            
+        })
         
     }
   },
