@@ -30,7 +30,7 @@
         <template slot-scope="scope">
           <el-button type="primary" size="mini" plain icon="el-icon-edit"></el-button>
           <el-button type="warning" size="mini" plain icon="el-icon-check"></el-button>
-          <el-button type="danger" size="mini" plain icon="el-icon-delete"></el-button>
+          <el-button type="danger" @click="deleteUser(scope.row.id)" size="mini" plain icon="el-icon-delete"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -219,6 +219,23 @@ export default {
         })
         
     },
+    //删除用户,删除的时候把id传过来
+    deleteUser(id){
+       // alert(id)
+       this.$myHttp({
+           url:`users/${id}`,
+           method:'delete',
+       }).then(backdata=>{
+           let {data,meta} =backdata.data;
+           //console.log(data,meta);
+           this.$message({
+               message:"删除成功",
+               type:"success"
+           });
+           //从数据库重新获取
+           this.getUserList();
+       })
+    }
   },
   //利用钩子函数在页面渲染之前获取用户列表数据
   mounted() {
