@@ -19,6 +19,19 @@
       <el-table-column property="username" label="姓名" width="180"></el-table-column>
       <el-table-column property="email" label="邮箱" width="220"></el-table-column>
       <el-table-column property="mobile" label="电话"></el-table-column>
+      <el-table-column property label="状态">
+        <!-- 想在table里面添加需要template 设置slot-scope="scope" -->
+        <template slot-scope="scope">
+          <el-switch v-model="value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column property label="操作">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" plain icon="el-icon-edit"></el-button>
+          <el-button type="warning" size="mini" plain icon="el-icon-check"></el-button>
+          <el-button type="danger" size="mini" plain icon="el-icon-delete"></el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -28,36 +41,24 @@ export default {
   data() {
     return {
       input3: "",
-
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄"
-        }
-      ]
+      value: true,
+      tableData: []
     };
   },
   //利用钩子函数在页面渲染之前获取用户列表数据
   mounted() {
     //封装了axios请求，名字为$myHttp
     this.$myHttp({
-    //由于封装了axios,前面那串固定的链接可省略
+      //由于封装了axios,前面那串固定的链接可省略
       url: "users?pagenum=1&pagesize=20",
-      method: "get",
+      method: "get"
       // `headers` 是即将被发送的自定义请求头，已封装到axios
-    //   headers: { "Authorization": window.localStorage.getItem("token") }
+      //   headers: { "Authorization": window.localStorage.getItem("token") }
     }).then(backdata => {
-     // console.log(backdata);
-      if(backdata.data.meta.status == 200){
-          this.tableData = backdata.data.data.users;
-      }else{
-
+      // console.log(backdata);
+      if (backdata.data.meta.status == 200) {
+        this.tableData = backdata.data.data.users;
+      } else {
       }
     });
   }
