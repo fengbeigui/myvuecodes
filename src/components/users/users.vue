@@ -33,7 +33,7 @@
       </el-table-column>
       <el-table-column property label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" plain icon="el-icon-edit"></el-button>
+          <el-button type="primary" @click="editUser(scope)" size="mini" plain icon="el-icon-edit"></el-button>
           <el-button type="warning" size="mini" plain icon="el-icon-check"></el-button>
           <el-button
             type="danger"
@@ -79,6 +79,29 @@
         <el-button type="primary" @click="addUserPost ">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 修改用户弹窗 -->
+    <el-dialog title="修改用户" :visible.sync="editUserShow">
+      <!--  使用双向数据绑定 操作表单数据 -->
+      <el-form :model="usereditData" :rules="rules" ref="userAddData">
+        <el-form-item label="用户名" label-width="200px" prop="username">
+          <el-input v-model="usereditData.username" :disabled="true" autocomplete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="邮箱" label-width="200px">
+          <el-input v-model="usereditData.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" label-width="200px" prop="mobile">
+          <el-input v-model="usereditData.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <!-- 关闭窗口 -->
+        <el-button @click="editUserShow = false">取 消</el-button>
+        <!--  绑定确定事件，发送数据到服务器入库 -->
+        <el-button type="primary" @click="editUserPut">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -86,7 +109,14 @@
 export default {
   data() {
     return {
-      /* 窗口显示控制数据 */
+      //修改用户窗口 隐藏显示
+      editUserShow: false,
+      usereditData: {
+        username: "",
+        email: "",
+        mobile: ""
+      },
+      //窗口显示控制数据,添加用户
       addUserShow: false,
       //注意这些名字是获取后台数据的名字，需要对应，使用mobile名导致手机并不显示
       userAddData: {
@@ -260,7 +290,15 @@ export default {
             message: "已取消删除"
           });
         });
-    }
+    },
+    //控制修改用户的窗口显示
+    editUser(scope) {
+        //接收点击事件传入的用户数据
+        //将数据修改到中usereditData 使数据展示在表单中
+      this.usereditData = scope.row;
+      this.editUserShow = true;
+    },
+    editUserPut() {}
   },
   //利用钩子函数在页面渲染之前获取用户列表数据
   mounted() {
