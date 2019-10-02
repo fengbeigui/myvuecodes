@@ -110,7 +110,6 @@ export default {
           }
         ]
       },
-
       //搜索框内容
       searchData: "",
       value: true,
@@ -134,9 +133,10 @@ export default {
         //由于封装了axios,前面那串固定的链接可省略
         //上面写了判断后赋值，这里就不需写: "users?pagenum=1&pagesize=20"
         url,
-        method: "get"
-        // `headers` 是即将被发送的自定义请求头，已封装到axios
-        //   headers: { "Authorization": window.localStorage.getItem("token") }
+        method: "get",
+        // `headers` 是即将被发送的自定义请求头，(H5新增本地缓存)
+        //已封装到axios,但是再次获取的时候不显示,还是得在这里添加请求头
+        headers: { Authorization: window.localStorage.getItem("token") }
       }).then(backdata => {
         //解析数据对象
         // console.log(backdata);
