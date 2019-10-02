@@ -34,7 +34,13 @@
       <el-table-column property label="操作">
         <template slot-scope="scope">
           <el-button type="primary" @click="editUser(scope)" size="mini" plain icon="el-icon-edit"></el-button>
-          <el-button type="warning" size="mini" plain icon="el-icon-check"></el-button>
+          <el-button
+            type="warning"
+            @click="rolesShowClick(scope)"
+            size="mini"
+            plain
+            icon="el-icon-check"
+          ></el-button>
           <el-button
             type="danger"
             @click="deleteUser(scope.row.id)"
@@ -102,6 +108,32 @@
         <el-button type="primary" @click="editUserPut">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 修改用户角色的弹窗 -->
+    <el-dialog title="修改用户角色" :visible.sync="rolesShow">
+      <!--  使用双向数据绑定 操作表单数据 -->
+      <el-form>
+        <el-form-item label="用户名" label-width="200px">
+          <span>{{rolesData.username}}</span>
+        </el-form-item>
+        <el-form-item label="角色" label-width="200px">
+          <el-select v-model="value" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <!-- 关闭窗口 -->
+        <el-button @click="quxiaoxiugai">取 消</el-button>
+        <!--  绑定确定事件，发送数据到服务器入库 -->
+        <el-button type="primary" @click="editUserPut">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -109,6 +141,30 @@
 export default {
   data() {
     return {
+         options: [{
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }],
+         value: '',
+
+      //修改用户角色
+      rolesShow: false,
+      //要修改角色的用户信息
+      rolesData: {},
+
+
       //修改用户窗口 隐藏显示
       editUserShow: false,
       usereditData: {
@@ -302,41 +358,47 @@ export default {
     },
     //修改用户数据
     editUserPut() {
-       // console.log(this.usereditData);
-       let id = this.usereditData.id;
-        let email = this.usereditData.email;
-        let mobile = this.usereditData.mobile;
-        //发送put请求到服务器
+      // console.log(this.usereditData);
+      let id = this.usereditData.id;
+      let email = this.usereditData.email;
+      let mobile = this.usereditData.mobile;
+      //发送put请求到服务器
       this.$myHttp({
-          url:`users/${id}`,
-          method:'put',
-          data:{email,mobile}
-      }).then(backdata=>{
-          //console.log(backdata);
-          //使用对象的解构赋值获取data及mate
-          let{data,meta} = backdata.data;
-          if(meta.status == 200){
-              this.$message({
-                  message:"修改成功",
-                  type:"sucess"
-              });
-          }else{
-              this.$message.error('修改失败');
-          }
-          //关掉窗口
-           this.editUserShow = false;
-          //不管修改成功还是失败，都重新加载数据
-           this.getUserList();
-
-      })
+        url: `users/${id}`,
+        method: "put",
+        data: { email, mobile }
+      }).then(backdata => {
+        //console.log(backdata);
+        //使用对象的解构赋值获取data及mate
+        let { data, meta } = backdata.data;
+        if (meta.status == 200) {
+          this.$message({
+            message: "修改成功",
+            type: "sucess"
+          });
+        } else {
+          this.$message.error("修改失败");
+        }
+        //关掉窗口
+        this.editUserShow = false;
+        //不管修改成功还是失败，都重新加载数据
+        this.getUserList();
+      });
     },
     //取消修改用户操作
-    quxiaoxiugai(){
-        //关闭窗口,
-        this.editUserShow =  false;
-        //重新获取数据,因为数据使用双向数据绑定，
-        //当点击取消按钮需要重新获取数据
-        this.getUserList();
+    quxiaoxiugai() {
+      //关闭窗口,
+      this.editUserShow = false;
+      //重新获取数据,因为数据使用双向数据绑定，
+      //当点击取消按钮需要重新获取数据
+      this.getUserList();
+    },
+    //修改用户角色窗口展示
+    rolesShowClick(scope) {
+       // console.log(scope);
+       this.rolesData = scope.row;
+       this.rolesShow = true;
+        
     }
   },
   //利用钩子函数在页面渲染之前获取用户列表数据
