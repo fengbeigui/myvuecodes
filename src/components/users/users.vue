@@ -28,7 +28,6 @@ export default {
   data() {
     return {
       input3: "",
-      select: "",
 
       tableData: [
         {
@@ -43,6 +42,18 @@ export default {
         }
       ]
     };
+  },
+  //利用钩子函数在页面渲染之前获取用户列表数据
+  mounted() {
+    //封装了axios请求，名字为$myHttp
+    this.$myHttp({
+      url: "http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=20",
+      method: "get",
+      // `headers` 是即将被发送的自定义请求头
+      headers: { "Authorization": window.localStorage.getItem("token") }
+    }).then(backdata => {
+      console.log(backdata);
+    });
   }
 };
 </script>
@@ -53,15 +64,15 @@ export default {
   text-align: left;
 }
 /* 输入框 */
-.el-input__inner{
-    width: 100%;
+.el-input__inner {
+  width: 100%;
 }
 /* 输入整行 */
 .input-with-select {
-    width: 30%;
+  width: 30%;
 }
 /* 日期栏 */
-.el-table th{
- line-height: 30px;
+.el-table th {
+  line-height: 30px;
 }
 </style>
