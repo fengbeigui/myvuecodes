@@ -54,10 +54,11 @@
 
     <!-- 分页 -->
     <el-pagination
-      :page-sizes="[100, 200, 300, 400]"
-      :page-size="100"
+        @size-change="sizeChange"
+      :page-sizes="[1, 2, 3, 4, 20]"
+      :page-size="20"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
     ></el-pagination>
 
     <!--  添加用户弹窗 ,不要那个冒号就不绑定了-->
@@ -149,6 +150,7 @@ export default {
       roleList: [],
       roleId: "",
 
+    
 
       //修改用户窗口 隐藏显示
       editUserShow: false,
@@ -198,16 +200,31 @@ export default {
       //搜索框内容
       searchData: "",
       value: true,
-      tableData: []
+      tableData: [],
+
+      //分页数据
+      //显示Invalid prop: type check failed for prop "total"；给他一个默认值0
+      total:2, //总条数
+      sizepage:20,
     };
   },
   methods: {
+
+      sizeChange(size){
+          //console.log(size);
+          this.sizepage = size;
+          this.getUserList();
+          
+      },
+
+
+
     //一开始接口发送get请求获取信息，模糊查询也需要获取
     //创建 封装getUserList一个公用的方法
     //传一个参数 query 默认为空
     getUserList(query = "") {
       if (query == "") {
-        var url = "users?pagenum=1&pagesize=20";
+        var url = `users?pagenum=1&pagesize=${this.sizepage}`;
       } else {
         //等于加上你传来的query
         var url = "users?pagenum=1&pagesize=20&query=" + query;
@@ -225,8 +242,13 @@ export default {
       }).then(backdata => {
         //解析数据对象
         // console.log(backdata);
-        if (backdata.data.meta.status == 200) {
-          this.tableData = backdata.data.data.users;
+            let {data,meta}  =  backdata.data;
+        if (meta.status == 200) {
+            //console.log(data.total);
+            this.total = data.total;
+            
+         // this.tableData = backdata.data.data.users;
+          this.tableData = data.users;
         } else {
         }
       });
@@ -421,6 +443,19 @@ export default {
 </script>
 
 <style>
+.el-pagination{
+    float: left;
+}
+.el-pager {
+   padding:0 4px;
+   background: #fff;
+   font-size:13px;
+   min-width: 35.5px;
+   height: 28px;
+   line-height: 28px;
+   -webkit-box-sizing:border-box;
+   box-sizing: border-box;
+}
 .el-main {
   line-height: 30px;
 }
