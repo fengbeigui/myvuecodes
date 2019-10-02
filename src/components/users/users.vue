@@ -16,9 +16,9 @@
     <!-- 表格 -->
     <el-table ref="singleTable" :data="tableData" highlight-current-row style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column property="date" label="日期" width="120"></el-table-column>
-      <el-table-column property="name" label="姓名" width="120"></el-table-column>
-      <el-table-column property="address" label="地址"></el-table-column>
+      <el-table-column property="username" label="姓名" width="180"></el-table-column>
+      <el-table-column property="email" label="邮箱" width="220"></el-table-column>
+      <el-table-column property="mobile" label="电话"></el-table-column>
     </el-table>
   </div>
 </template>
@@ -53,6 +53,11 @@ export default {
       headers: { "Authorization": window.localStorage.getItem("token") }
     }).then(backdata => {
       console.log(backdata);
+      if(backdata.data.meta.status == 200){
+          this.tableData = backdata.data.data.users;
+      }else{
+
+      }
     });
   }
 };
