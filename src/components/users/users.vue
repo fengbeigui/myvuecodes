@@ -22,7 +22,8 @@
       <el-table-column property label="状态">
         <!-- 想在table里面添加需要template 设置slot-scope="scope" -->
         <template slot-scope="scope">
-          <el-switch v-model="value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+            <!-- 此时我们通过scope获取状态数据 -->
+          <el-switch v-model="scope.row.mg_state" @change="mgStateChange(scope)" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </template>
       </el-table-column>
       <el-table-column property label="操作">
@@ -187,11 +188,37 @@ export default {
           });
           //把窗口关掉
           this.addUserShow = false;
+         
           //如果成功，重新获取数据
           this.getUserList();
         }
       });
-    }
+    },
+    //状态改变事件，scope不一般
+    mgStateChange(scope){
+        //console.log(scope);
+        this.$myHttp({
+            //url:'users/:uId/state/:type',
+            url:`users/${scope.row.id}/state/${scope.row.mg_state}`,
+            method:'put',
+            headers: { Authorization: window.localStorage.getItem("token") }
+        }).then(backdata=>{
+            console.log(backdata);
+            let {data,meta} = backdata.data;
+            if(meta.status ==200){
+                //提示成功
+                this.$message({message:"修改状态成功",tupe:"success"})
+            }else{
+                //值是tableData控制的,如果修改失败，$index取反
+                //实现数据接口请求失败，状态不动
+                //1获取点击的元素，scope的#index就是点击的那个元素的数组下标
+                //修改状态值 获取修改后的页面的值，然后取反重新赋值
+                this.tableData[scope.$index].mg_state = !scope.row.mg_state;
+            }
+            
+        })
+        
+    },
   },
   //利用钩子函数在页面渲染之前获取用户列表数据
   mounted() {
