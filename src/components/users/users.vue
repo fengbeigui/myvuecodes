@@ -8,8 +8,8 @@
     </el-breadcrumb>
     <!-- 搜索 -->
     <div style="margin-top: 5px;" class="search">
-      <el-input placeholder="请输入内容" v-model="input3" class="input-with-select">
-        <el-button slot="append" icon="el-icon-search"></el-button>
+      <el-input placeholder="请输入内容" v-model="searchData" class="input-with-select">
+        <el-button slot="append" @click.stop="searchGet" icon="el-icon-search"></el-button>
       </el-input>
       <el-button type="primary">主要按钮</el-button>
     </div>
@@ -44,7 +44,6 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="400"
     ></el-pagination>
-    
   </div>
 </template>
 
@@ -52,27 +51,53 @@
 export default {
   data() {
     return {
-      input3: "",
+      //搜索框内容
+      searchData: "",
       value: true,
       tableData: []
     };
   },
+  methods: {
+    //一开始接口发送get请求获取信息，模糊查询也需要获取
+    //创建 封装getUserList一个公用的方法
+    //传一个参数 query 默认为空
+    getUserList(query='') {
+        if(query==''){
+            var url = "users?pagenum=1&pagesize=20"
+        }else{
+            //等于加上你传来的query
+            var url = "users?pagenum=1&pagesize=20&query="+query;
+        }
+
+      //封装了axios请求，名字为$myHttp
+      this.$myHttp({
+        //由于封装了axios,前面那串固定的链接可省略
+        //上面写了判断后赋值，这里就不需写: "users?pagenum=1&pagesize=20"
+        url,
+        method: "get"
+        // `headers` 是即将被发送的自定义请求头，已封装到axios
+        //   headers: { "Authorization": window.localStorage.getItem("token") }
+      }).then(backdata => {
+        // console.log(backdata);
+        if (backdata.data.meta.status == 200) {
+          this.tableData = backdata.data.data.users;
+        } else {
+        }
+      });
+    },
+    //模糊查找搜索信息,把searchData值传过来
+    searchGet() {
+    //   this.$myHttp({
+    //     method: "get",
+    //     url: "users?"
+    //   });
+    this.getUserList(this.searchData);
+    }
+  },
   //利用钩子函数在页面渲染之前获取用户列表数据
   mounted() {
-    //封装了axios请求，名字为$myHttp
-    this.$myHttp({
-      //由于封装了axios,前面那串固定的链接可省略
-      url: "users?pagenum=1&pagesize=20",
-      method: "get"
-      // `headers` 是即将被发送的自定义请求头，已封装到axios
-      //   headers: { "Authorization": window.localStorage.getItem("token") }
-    }).then(backdata => {
-      // console.log(backdata);
-      if (backdata.data.meta.status == 200) {
-        this.tableData = backdata.data.data.users;
-      } else {
-      }
-    });
+      //调用 获取所有用户的信息，传searchData值过来
+      this.getUserList();
   }
 };
 </script>
