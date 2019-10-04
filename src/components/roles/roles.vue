@@ -69,6 +69,7 @@
       <!-- 设置展示节点 :props="defaultProps" -->
 
       <el-tree
+        ref="tree"
         default-expand-all
         :data="rightsData"
         show-checkbox
@@ -80,7 +81,7 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="rightsShow = false">取 消</el-button>
-        <el-button type="primary" @click="rightsShow = false">确 定</el-button>
+        <el-button type="primary" @click="rightsEditPost">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -90,6 +91,8 @@
 export default {
   data() {
     return {
+      //存起来的角色id
+      roleId: 0,
       //所有选中权限的数组集;
       checkedArr: [],
       //权限数据
@@ -142,6 +145,8 @@ export default {
     },
     //控制权限面板的显示
     rightsisShow(row) {
+      //当获取面板的时候，把id存起来
+      this.roleId = row.id;
       //所有权限row
       //获取本角色拥有的所有数据，数据中有权限
       //console.log(row);
@@ -175,6 +180,38 @@ export default {
         }
       });
       this.rightsShow = true;
+    },
+
+    //修改角色权限的事件
+    rightsEditPost() {
+        //getCheckedKeys获取所有选中节点的key数组形式返回
+        //getHalfCheckedKeys获取所有半选中节点的key数组
+      // var a = this.$refs.tree.getCheckedKeys();
+      // var b = this.$refs.tree.getHalfCheckedKeys();
+      // var c = a.concat(b);
+      // console.log(c.join());
+      //合并成一句代码的方法
+      var rids = this.$refs.tree
+        .getCheckedKeys()
+        .concat(this.$refs.tree.getHalfCheckedKeys())
+        .join();
+
+      this.$myHttp({
+          //上面存有id，这里就可以这样写roleId
+        url: `roles/${this.roleId}/rights`,
+        method: "post",
+        data: { rids }
+      }).then(back => {
+        let {  meta } = back.data;
+        console.log(meta );
+        
+        if (meta.status == 200) {
+          this.$message({ message: meta.msg, type: "success" });
+          //修改权限后，重新获取数据
+          this.getRoleLists();
+        }
+      });
+      this.rightsShow = false;
     }
   },
   //在页面渲染之前获取所有角色数据
