@@ -13,8 +13,7 @@
             <!--   el-col是两个小盒子 -->
             <el-col :span="6">
               <!--  el-tag直接放数据 -->
-              <el-tag>{{items.authName}}</el-tag>
-              &gt;
+              <el-tag>{{items.authName}}</el-tag>&gt;
             </el-col>
             <!-- 这是另一个小盒子 -->
             <el-col :span="18">
@@ -24,14 +23,16 @@
                 <!--小盒子里面的小盒子分为两块 -->
                 <el-col :span="6">
                   <!-- el-tag标签的样式 -->
-                  <el-tag type="success">{{item2.authName}}</el-tag>
-                  &gt;
+                  <el-tag type="success">{{item2.authName}}</el-tag>&gt;
                 </el-col>
                 <!-- 三级标签 直接横着显示一行,写在el-tag-->
                 <el-col :span="18">
-                     <!-- (item2,key3)循环三的时候是把二的值传过来 -->
-                  <el-tag                
-                  @close="deleteTag(item2,key3)"
+                  <!-- (item2,key3)循环三的时候是把二的值传过来 -->
+                  <!-- item2,key3,scope.row.id,item3.id传过来 -->
+                  <!-- scope.row.id拿到角色id -->
+                  <!--  权限的ID，item3.id -->
+                  <el-tag
+                    @close="deleteTag(item2,key3,scope.row.id,item3.id)"
                     v-for="(item3,key3) in item2.children"
                     :key="item3.id"
                     closable
@@ -79,11 +80,25 @@ export default {
         }
       });
     },
-    //删除角色权限标签
-    deleteTag(item,key){
-    //数组使用引用传递，直接删除父级数组中的第几个就会影响到全局所有数组
-    item.children.splice(key,1);
-    },
+    //删除角色权限标签，
+    //上面定义item2,key3,scope.row.id,item3.id后可以把item,key,roleId,rightId拿到
+    deleteTag(item, key, roleId, rightId) {
+        //需要角色id和权限id
+      this.$myHttp({
+          //拼接URL
+        url: `roles/${roleId}/rights/${rightId}`,
+        method: "delete"
+      }).then(back => {
+        let { data, meta } = back.data;
+        //console.log(data,meta);
+        //判断是否成功
+        if (meta.status == 200) {
+          this.$message({ message: meta.msg, type: "success" });
+          //数组使用引用传递，直接删除父级数组中的第几个就会影响到全局所有数组
+          item.children.splice(key, 1); //删除页面展示权限
+        }
+      });
+    }
   },
   //在页面渲染之前获取所有角色数据
   mounted() {
