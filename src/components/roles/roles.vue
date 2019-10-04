@@ -29,8 +29,10 @@
                 </el-col>
                 <!-- 三级标签 直接横着显示一行,写在el-tag-->
                 <el-col :span="18">
-                  <el-tag
-                    v-for="item3 in item2.children"
+                     <!-- (item2,key3)循环三的时候是把二的值传过来 -->
+                  <el-tag                
+                  @close="deleteTag(item2,key3)"
+                    v-for="(item3,key3) in item2.children"
                     :key="item3.id"
                     closable
                     type="warning"
@@ -76,7 +78,12 @@ export default {
           this.roleLists = data;
         }
       });
-    }
+    },
+    //删除角色权限标签
+    deleteTag(item,key){
+    //数组使用引用传递，直接删除父级数组中的第几个就会影响到全局所有数组
+    item.children.splice(key,1);
+    },
   },
   //在页面渲染之前获取所有角色数据
   mounted() {
