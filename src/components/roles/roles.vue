@@ -6,15 +6,39 @@
     <el-table :data="roleLists" style="width: 100%">
       <!-- 折叠数据 -->
       <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="商品名称">
-              <span>{{ props.row.name }}</span>
-            </el-form-item>
-            <el-form-item label="所属店铺">
-              <span>{{ props.row.shop }}</span>
-            </el-form-item>
-          </el-form>
+        <template slot-scope="scope">
+          <!-- el-row是一个大盒子 -->
+          <!-- 在el-row里面遍历 -->
+          <el-row v-for="items in scope.row.children" :key="items.id" closable>
+            <!--   el-col是两个小盒子 -->
+            <el-col :span="6">
+              <!--  el-tag直接放数据 -->
+              <el-tag>{{items.authName}}</el-tag>
+              &gt;
+            </el-col>
+            <!-- 这是另一个小盒子 -->
+            <el-col :span="18">
+              <!--  小盒子里面的小盒子 -->
+              <!-- 里面再循环items的children -->
+              <el-row v-for="item2 in items.children" :key="item2.id" closable>
+                <!--小盒子里面的小盒子分为两块 -->
+                <el-col :span="6">
+                  <!-- el-tag标签的样式 -->
+                  <el-tag type="success">{{item2.authName}}</el-tag>
+                  &gt;
+                </el-col>
+                <!-- 三级标签 直接横着显示一行,写在el-tag-->
+                <el-col :span="18">
+                  <el-tag
+                    v-for="item3 in item2.children"
+                    :key="item3.id"
+                    closable
+                    type="warning"
+                  >{{item3.authName}}</el-tag>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
         </template>
       </el-table-column>
       <!-- 表头信息 -->
@@ -80,5 +104,8 @@ export default {
 }
 .el-main {
   line-height: 20px;
+}
+.el-tag {
+  margin-top: 10px;
 }
 </style>
