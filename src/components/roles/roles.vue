@@ -49,17 +49,23 @@
       <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
       <el-table-column label="操作" prop="desc">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" round></el-button>
+          <el-button
+            @click="roleEdit(scope.row)"
+            type="primary"
+            size="mini"
+            icon="el-icon-edit"
+            round
+          ></el-button>
           <el-button
             @click="roleDelete(scope.row.id)"
-            type="success"
+            type="danger"
             size="mini"
             icon="el-icon-delete"
             round
           ></el-button>
           <el-button
             @click="rightsisShow(scope.row)"
-            type="info"
+            type="success"
             size="mini"
             icon="el-icon-check"
             round
@@ -110,6 +116,26 @@
         <el-button type="primary" @click="addRolsePost ">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 修改角色窗口面板 -->
+    <el-dialog title="修改角色" :visible.sync="editRolesShow">
+      <!--  使用双向数据绑定 操作表单数据 -->
+      <el-form :model="editRolesData">
+        <el-form-item label="角色名称" label-width="200px" prop="username">
+          <el-input v-model="editRolesData.roleName" autocomplete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="角色描述" label-width="200px" prop="username">
+          <el-input v-model="editRolesData.roleDesc" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <!-- 关闭窗口 -->
+        <el-button @click="editRolesShow = false">取 消</el-button>
+        <!--  绑定确定事件，发送数据到服务器入库 -->
+        <el-button type="primary" @click="editRolsePut ">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -117,13 +143,21 @@
 export default {
   data() {
     return {
+      //修改角色
+      editRolesShow: false,
+      editRolesData: {
+        roleName: "",
+        roleDesc: ""
+      },
+
       //添加角色
       addRolesShow: false,
       addRolesData: {
         roleName: "",
         roleDesc: ""
       },
-      //存起来的角色id
+      //存起来的角色id，默认为0；
+      //默认值是什么无所谓，因为每次使用前都会对其重新赋值
       roleId: 0,
       //所有选中权限的数组集;
       checkedArr: [],
@@ -142,6 +176,37 @@ export default {
     };
   },
   methods: {
+    //修改角色弹窗
+    roleEdit(row) {
+      //注意别忘了前面的this.
+      this.editRolesData.roleName = row.roleName;
+      this.editRolesData.roleDesc = row.roleDesc;
+      //被修改角色的id记录下来，方便提交数据时使用
+      this.roleId = row.id; 
+      this.editRolesShow = true;
+    },
+    //修改角色信息发送
+    editRolsePut() {
+        //获取表单数据及角色id
+      this.$myHttp({
+        //this.roleId; //获取到roleEdit赋值的id
+        url: `roles/${this.roleId}`,
+        method: "put",
+        data: this.editRolesData
+      }).then(back => {
+        let { data, meta } = back.data;
+        if (meta.status == 200) {
+          this.$message({
+            type: "success",
+            message: "修改角色成功!"
+          });
+          this.editRolesShow=false;//关闭窗口
+          //获取数据，重新渲染页面
+          this.getRoleLists();
+        }
+      });
+    },
+
     //删除角色事件：
     roleDelete(roleId) {
       //roleId获取id,可任意定义的名字
