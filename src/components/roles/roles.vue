@@ -50,7 +50,13 @@
       <el-table-column label="操作" prop="desc">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" round></el-button>
-          <el-button type="success" size="mini" icon="el-icon-delete" round></el-button>
+          <el-button
+            @click="roleDelete(scope.row.id)"
+            type="success"
+            size="mini"
+            icon="el-icon-delete"
+            round
+          ></el-button>
           <el-button
             @click="rightsisShow(scope.row)"
             type="info"
@@ -88,7 +94,7 @@
     <!-- 添加角色窗口面板 -->
     <el-dialog title="添加角色" :visible.sync="addRolesShow">
       <!--  使用双向数据绑定 操作表单数据 -->
-      <el-form :model="addRolesData"  >
+      <el-form :model="addRolesData">
         <el-form-item label="角色名称" label-width="200px" prop="username">
           <el-input v-model="addRolesData.roleName" autocomplete="off"></el-input>
         </el-form-item>
@@ -113,9 +119,9 @@ export default {
     return {
       //添加角色
       addRolesShow: false,
-      addRolesData:{
-          roleName:'',
-          roleDesc:''
+      addRolesData: {
+        roleName: "",
+        roleDesc: ""
       },
       //存起来的角色id
       roleId: 0,
@@ -136,26 +142,60 @@ export default {
     };
   },
   methods: {
+    //删除角色事件：
+    roleDelete(roleId) {
+      //roleId获取id,可任意定义的名字
+      //console.log(roleId);
+      this.$confirm("此操作将永久删除该角色, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          //如果点击确定按钮，证明确定要执行删除操作
+          //请求接口
+          this.$myHttp({
+            url: "roles/" + roleId,
+            method: "delete"
+          }).then(back => {
+            let { data, meta } = back.data;
+            //console.log(data,meta);
+            if (meta.status == 200) {
+              this.$message({
+                type: "success",
+                message: "删除角色成功!"
+              });
+              //获取数据，重新渲染页面
+              this.getRoleLists();
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消角色删除"
+          });
+        });
+    },
     //展示添加角色弹窗
     rolesisShow() {
       this.addRolesShow = true;
     },
     //添加角色确定按钮
     addRolsePost() {
-        this.$myHttp({
-            url:'roles',
-            method:'post',
-            data:this.addRolesData
-        }).then(back=>{
-            let {data,meta} =back.data;
-            //console.log(data,meta);
-            if(meta.status == 201){
-                this.$message({message:meta.msg,type:'success'});
-                this.addRolesShow = false;//关闭窗口
-                this.getRoleLists(); //重新加载数据
-            }
-            
-        })
+      this.$myHttp({
+        url: "roles",
+        method: "post",
+        data: this.addRolesData
+      }).then(back => {
+        let { data, meta } = back.data;
+        //console.log(data,meta);
+        if (meta.status == 201) {
+          this.$message({ message: meta.msg, type: "success" });
+          this.addRolesShow = false; //关闭窗口
+          this.getRoleLists(); //重新加载数据
+        }
+      });
     },
     //给他定义一个方法
     //获取所有信息
