@@ -51,16 +51,22 @@
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" round></el-button>
           <el-button type="success" size="mini" icon="el-icon-delete" round></el-button>
-          <el-button @click="rightsisShow" type="info" size="mini" icon="el-icon-check" round></el-button>
+          <el-button
+            @click="rightsisShow(scope.row)"
+            type="info"
+            size="mini"
+            icon="el-icon-check"
+            round
+          ></el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-dialog title="分配权限" :visible.sync="rightsShow">
-        <!-- default-expand-all默认全展开节点 -->
-        <!-- 是否设置节点为可选节点show-checkbox -->
-       <!--  node-key="id"本节点的唯一id -->
-       <!-- 设置展示节点 :props="defaultProps" -->
+      <!-- default-expand-all默认全展开节点 -->
+      <!-- 是否设置节点为可选节点show-checkbox -->
+      <!--  node-key="id"本节点的唯一id -->
+      <!-- 设置展示节点 :props="defaultProps" -->
 
       <el-tree
         default-expand-all
@@ -68,7 +74,7 @@
         show-checkbox
         node-key="id"
         :default-expanded-keys="[2, 3]"
-        :default-checked-keys="[5]"
+        :default-checked-keys="checkedArr"
         :props="defaultProps"
       ></el-tree>
 
@@ -84,11 +90,14 @@
 export default {
   data() {
     return {
+      //所有选中权限的数组集;
+      checkedArr: [],
+      //权限数据
       rightsData: [],
       //设置展示节点内容
       defaultProps: {
-        children: "children",//设置子元素是数据中的children属性
-        label: "authName"//设置节点名称为数据中的authName
+        children: "children", //设置子元素是数据中的children属性
+        label: "authName" //设置节点名称为数据中的authName
       },
       //分配权限面板的控制
       rightsShow: false,
@@ -132,7 +141,25 @@ export default {
       });
     },
     //控制权限面板的显示
-    rightsisShow() {
+    rightsisShow(row) {
+      //所有权限row
+      //获取本角色拥有的所有数据，数据中有权限
+      //console.log(row);
+      //row.children.children.children.id
+      //为了防止其他数据的影响，每次获取权限都要先清空以前的权限数据
+      this.checkedArr = [];
+      //角色数据中的children就是这个角色所拥有的所有权限
+      var arr = row.children;
+      arr.forEach(items => {
+        items.children.forEach(item2 => {
+          item2.children.forEach(item3 => {
+            //因为elUI中只要有一个第三级权限被选中，父级也会被半选中
+            //所以，我们只需要获取第三季权限，父级及爷爷级权限都会被选中
+            this.checkedArr.push(item3.id);
+          });
+        });
+      });
+
       //获取所有权限
       this.$myHttp({
         //url:`rights/list`
@@ -143,7 +170,7 @@ export default {
         let { data, meta } = back.data;
         //console.log(data);
         if (meta.status == 200) {
-            //将获取到的所有权限数据，以树状结构展示到页面中
+          //将获取到的所有权限数据，以树状结构展示到页面中
           this.rightsData = data;
         }
       });
