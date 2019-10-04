@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 添加按钮 -->
-    <el-button type="primary">主要按钮</el-button>
+    <el-button class="RoleButton" @click="rolesisShow" type="primary">添加角色</el-button>
     <!--  :data 整个表格中所有数据的数据源 -->
     <el-table :data="roleLists" style="width: 100%">
       <!-- 折叠数据 -->
@@ -84,6 +84,26 @@
         <el-button type="primary" @click="rightsEditPost">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 添加角色窗口面板 -->
+    <el-dialog title="添加角色" :visible.sync="addRolesShow">
+      <!--  使用双向数据绑定 操作表单数据 -->
+      <el-form :model="addRolesData"  >
+        <el-form-item label="角色名称" label-width="200px" prop="username">
+          <el-input v-model="addRolesData.roleName" autocomplete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="角色描述" label-width="200px" prop="username">
+          <el-input v-model="addRolesData.roleDesc" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <!-- 关闭窗口 -->
+        <el-button @click="addRolesShow = false">取 消</el-button>
+        <!--  绑定确定事件，发送数据到服务器入库 -->
+        <el-button type="primary" @click="addRolsePost ">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,6 +111,12 @@
 export default {
   data() {
     return {
+      //添加角色
+      addRolesShow: false,
+      addRolesData:{
+          roleName:'',
+          roleDesc:''
+      },
       //存起来的角色id
       roleId: 0,
       //所有选中权限的数组集;
@@ -110,6 +136,27 @@ export default {
     };
   },
   methods: {
+    //展示添加角色弹窗
+    rolesisShow() {
+      this.addRolesShow = true;
+    },
+    //添加角色确定按钮
+    addRolsePost() {
+        this.$myHttp({
+            url:'roles',
+            method:'post',
+            data:this.addRolesData
+        }).then(back=>{
+            let {data,meta} =back.data;
+            //console.log(data,meta);
+            if(meta.status == 201){
+                this.$message({message:meta.msg,type:'success'});
+                this.addRolesShow = false;//关闭窗口
+                this.getRoleLists(); //重新加载数据
+            }
+            
+        })
+    },
     //给他定义一个方法
     //获取所有信息
     getRoleLists() {
@@ -184,8 +231,8 @@ export default {
 
     //修改角色权限的事件
     rightsEditPost() {
-        //getCheckedKeys获取所有选中节点的key数组形式返回
-        //getHalfCheckedKeys获取所有半选中节点的key数组
+      //getCheckedKeys获取所有选中节点的key数组形式返回
+      //getHalfCheckedKeys获取所有半选中节点的key数组
       // var a = this.$refs.tree.getCheckedKeys();
       // var b = this.$refs.tree.getHalfCheckedKeys();
       // var c = a.concat(b);
@@ -197,14 +244,14 @@ export default {
         .join();
 
       this.$myHttp({
-          //上面存有id，这里就可以这样写roleId
+        //上面存有id，这里就可以这样写roleId
         url: `roles/${this.roleId}/rights`,
         method: "post",
         data: { rids }
       }).then(back => {
-        let {  meta } = back.data;
-        console.log(meta );
-        
+        let { meta } = back.data;
+        console.log(meta);
+
         if (meta.status == 200) {
           this.$message({ message: meta.msg, type: "success" });
           //修改权限后，重新获取数据
@@ -223,7 +270,7 @@ export default {
 </script>
 
 <style>
-.el-button {
+.RoleButton {
   float: left;
 }
 .demo-table-expand {
