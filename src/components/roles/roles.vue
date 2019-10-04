@@ -51,10 +51,32 @@
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" round></el-button>
           <el-button type="success" size="mini" icon="el-icon-delete" round></el-button>
-          <el-button type="info" size="mini" icon="el-icon-check" round></el-button>
+          <el-button @click="rightsisShow" type="info" size="mini" icon="el-icon-check" round></el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog title="分配权限" :visible.sync="rightsShow">
+        <!-- default-expand-all默认全展开节点 -->
+        <!-- 是否设置节点为可选节点show-checkbox -->
+       <!--  node-key="id"本节点的唯一id -->
+       <!-- 设置展示节点 :props="defaultProps" -->
+
+      <el-tree
+        default-expand-all
+        :data="rightsData"
+        show-checkbox
+        node-key="id"
+        :default-expanded-keys="[2, 3]"
+        :default-checked-keys="[5]"
+        :props="defaultProps"
+      ></el-tree>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="rightsShow = false">取 消</el-button>
+        <el-button type="primary" @click="rightsShow = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -62,6 +84,16 @@
 export default {
   data() {
     return {
+      rightsData: [],
+      //设置展示节点内容
+      defaultProps: {
+        children: "children",//设置子元素是数据中的children属性
+        label: "authName"//设置节点名称为数据中的authName
+      },
+      //分配权限面板的控制
+      rightsShow: false,
+
+      //表格中展示的数据
       roleLists: []
     };
   },
@@ -83,9 +115,9 @@ export default {
     //删除角色权限标签，
     //上面定义item2,key3,scope.row.id,item3.id后可以把item,key,roleId,rightId拿到
     deleteTag(item, key, roleId, rightId) {
-        //需要角色id和权限id
+      //需要角色id和权限id
       this.$myHttp({
-          //拼接URL
+        //拼接URL
         url: `roles/${roleId}/rights/${rightId}`,
         method: "delete"
       }).then(back => {
@@ -98,6 +130,24 @@ export default {
           item.children.splice(key, 1); //删除页面展示权限
         }
       });
+    },
+    //控制权限面板的显示
+    rightsisShow() {
+      //获取所有权限
+      this.$myHttp({
+        //url:`rights/list`
+        //获取树状结构的数据更为合适
+        url: `rights/tree`,
+        method: "get"
+      }).then(back => {
+        let { data, meta } = back.data;
+        //console.log(data);
+        if (meta.status == 200) {
+            //将获取到的所有权限数据，以树状结构展示到页面中
+          this.rightsData = data;
+        }
+      });
+      this.rightsShow = true;
     }
   },
   //在页面渲染之前获取所有角色数据
