@@ -4,6 +4,7 @@ import HelloHome from '@/components/HelloHome'
 //导入登录
 import Login from '@/components/login/login'
 import Users from '@/components/users/users'
+import Rights from '@/components/rights/rights'
 
 Vue.use(Router)
 
@@ -19,7 +20,12 @@ export default new Router({
           path:'/users',
           name: 'users',
           component: Users
-        }
+        },
+        {
+          path:'/rights',
+          name: 'rights',
+          component: Rights
+        },
       ]
     },
     {
