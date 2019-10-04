@@ -45,7 +45,7 @@
                 <span>权限管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="ccccc">
+                <el-menu-item index="roles">
                   <i class="el-icon-tickets"></i>角色列表
                 </el-menu-item>
                 <el-menu-item index="rights">

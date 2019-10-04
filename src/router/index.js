@@ -5,6 +5,7 @@ import HelloHome from '@/components/HelloHome'
 import Login from '@/components/login/login'
 import Users from '@/components/users/users'
 import Rights from '@/components/rights/rights'
+import Roles from '@/components/roles/roles'
 
 Vue.use(Router)
 
@@ -25,6 +26,11 @@ export default new Router({
           path:'/rights',
           name: 'rights',
           component: Rights
+        },
+        {
+          path:'/roles',
+          name: 'roles',
+          component: Roles
         },
       ]
     },
